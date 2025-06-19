@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Add Product') }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">{{ _('Add New Product') }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">{{ _('Product Name') }}</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">{{ _('Description') }}</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="container_type" class="form-label">{{ _('Type de contenant') }}</label>
+                        <select class="form-select" id="container_type" name="container_type" required>
+                            <option value="">{{ _('Sélectionner le type de contenant') }}</option>
+                            <option value="Jerrican 20L">Jerrican 20L</option>
+                            <option value="Jerrican 5L">Jerrican 5L</option>
+                            <option value="Seau métallique 20L">Seau métallique 20L</option>
+                            <option value="Carton (4x5L)">Carton (4x5L)</option>
+                            <option value="Spray">Spray</option>
+                            <option value="Fût 200L">Fût 200L</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="product_type" class="form-label">{{ _('Type de produit') }}</label>
+                        <select class="form-select" id="product_type" name="product_type" required>
+                            <option value="">{{ _('Sélectionner le type de produit') }}</option>
+                            <option value="oil">{{ _('Huile') }}</option>
+                            <option value="grease">{{ _('Graisse') }}</option>
+                            <option value="fluid">{{ _('Fluide') }}</option>
+                            <option value="additive">{{ _('Additif') }}</option>
+                            <option value="other">{{ _('Autre') }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">{{ _('Quantité') }}</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" value="0" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="min_stock_level" class="form-label">{{ _('Niveau de stock minimum') }}</label>
+                        <input type="number" class="form-control" id="min_stock_level" name="min_stock_level" value="10" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="unit" class="form-label">{{ _('Unité') }}</label>
+                        <select class="form-select" id="unit" name="unit" required>
+                            <option value="pcs">{{ _('Pièces') }}</option>
+                            <option value="box">{{ _('Cartons') }}</option>
+                            <option value="kg">{{ _('Kilogrammes') }}</option>
+                            <option value="l">{{ _('Litres') }}</option>
+                            <option value="m">{{ _('Mètres') }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">{{ _('Image du produit') }}</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <div class="form-text">{{ _('Taille maximale : 16MB. Formats supportés : JPG, PNG, GIF') }}</div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">{{ _('Ajouter le produit') }}</button>
+                        <a href="{{ url_for('products') }}" class="btn btn-secondary">{{ _('Annuler') }}</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Enable image paste for the product image field
+const imageInput = document.getElementById('image');
+const form = imageInput.closest('form');
+
+form.addEventListener('paste', function(event) {
+    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            const file = items[i].getAsFile();
+            // Create a DataTransfer to set the file input
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            imageInput.files = dt.files;
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let preview = document.getElementById('pasted-image-preview');
+                if (!preview) {
+                    preview = document.createElement('img');
+                    preview.id = 'pasted-image-preview';
+                    preview.className = 'img-thumbnail mt-2';
+                    preview.style.maxWidth = '200px';
+                    imageInput.parentNode.appendChild(preview);
+                }
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.preventDefault();
+            break;
+        }
+    }
+});
+</script>
+{% endblock %} 

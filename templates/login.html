@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Login') }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 400px; margin: 60px auto;">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title text-center mb-4">{{ _('Login') }}</h2>
+            <form method="POST" action="" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-control", placeholder=_('Username')) }}
+                    {% for error in form.username.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control", placeholder=_('Password')) }}
+                    {% for error in form.password.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="d-grid mb-3">
+                    {{ form.submit(class="btn btn-primary btn-block") }}
+                </div>
+            </form>
+            <div class="d-grid">
+                <a href="{{ url_for('reset_admin') }}" class="btn btn-outline-secondary btn-block">{{ _('Reset Password') }}</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}{% endblock %}
+

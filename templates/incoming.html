@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Incoming Stock') }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ _('Incoming Stock') }}</h2>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addIncomingModal">
+        <i class="fas fa-plus me-2"></i>{{ _('Add Incoming Stock') }}
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{{ _('Product') }}</th>
+                        <th>{{ _('Supplier') }}</th>
+                        <th>{{ _('Expected Date') }}</th>
+                        <th>{{ _('Quantity') }}</th>
+                        <th>{{ _('PO Number') }}</th>
+                        <th>{{ _('Status') }}</th>
+                        <th>{{ _('Actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in incoming %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.supplier }}</td>
+                        <td>{{ item.expected_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ item.expected_quantity }} {{ item.product.unit }}</td>
+                        <td>{{ item.po_number }}</td>
+                        <td>
+                            <span class="badge {% if item.status == 'pending' %}bg-warning{% elif item.status == 'received' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ item.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-success" onclick="markAsReceived({{ item.id }})">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="cancelDelivery({{ item.id }})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Incoming Stock Modal -->
+<div class="modal fade" id="addIncomingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('Add Incoming Stock') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="incomingForm" onsubmit="return handleIncomingStock(event)">
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Product') }}</label>
+                        <select class="form-select" name="product_id" required>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Supplier') }}</label>
+                        <input type="text" class="form-control" name="supplier" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Expected Date') }}</label>
+                        <input type="date" class="form-control" name="expected_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Expected Quantity') }}</label>
+                        <input type="number" class="form-control" name="expected_quantity" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('PO Number') }}</label>
+                        <input type="text" class="form-control" name="po_number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Notes') }}</label>
+                        <textarea class="form-control" name="notes"></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">{{ _('Add Incoming Stock') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function handleIncomingStock(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    try {
+        const response = await fetch('/incoming/add', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            const data = await response.json();
+            alert(data.error || '{{ _("An error occurred") }}');
+        }
+    } catch (error) {
+        alert('{{ _("An error occurred") }}');
+    }
+    
+    return false;
+}
+
+async function markAsReceived(id) {
+    if (!confirm('{{ _("Mark this delivery as received?") }}')) return;
+    
+    try {
+        const response = await fetch(`/incoming/${id}/receive`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            const data = await response.json();
+            alert(data.error || '{{ _("An error occurred") }}');
+        }
+    } catch (error) {
+        alert('{{ _("An error occurred") }}');
+    }
+}
+
+async function cancelDelivery(id) {
+    if (!confirm('{{ _("Cancel this delivery?") }}')) return;
+    
+    try {
+        const response = await fetch(`/incoming/${id}/cancel`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            const data = await response.json();
+            alert(data.error || '{{ _("An error occurred") }}');
+        }
+    } catch (error) {
+        alert('{{ _("An error occurred") }}');
+    }
+}
+</script>
+{% endblock %} 

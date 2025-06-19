@@ -1,0 +1,84 @@
+/* Custom modern UI for Ewakor Inventory */
+body {
+    background: #f6f6f4;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    color: #222;
+}
+.sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 220px;
+    background: #181a1b;
+    color: #fff;
+    padding: 32px 0 0 0;
+    z-index: 1000;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+}
+.sidebar .logo {
+    font-size: 1.3rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 2rem;
+    padding-left: 32px;
+}
+.sidebar nav {
+    flex: 1;
+}
+.sidebar nav a {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 32px;
+    font-size: 1rem;
+    border-left: 4px solid transparent;
+    transition: background 0.2s, border 0.2s;
+}
+.sidebar nav a.active, .sidebar nav a:hover {
+    background: #232526;
+    border-left: 4px solid #ffd600;
+    color: #ffd600;
+}
+.sidebar .user {
+    margin: 2rem 0 0 0;
+    padding-left: 32px;
+    font-size: 0.95rem;
+    color: #bbb;
+}
+.main-content {
+    margin-left: 220px;
+    padding: 32px 40px 40px 40px;
+}
+.card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    padding: 28px 32px;
+    margin-bottom: 32px;
+}
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+.table-products img {
+    max-width: 48px;
+    max-height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+.btn-primary {
+    background: #0054A6;
+    color: #fff !important;
+    border: none;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 8px 20px;
+    transition: background 0.2s;
+}
+.btn-primary:hover {
+    background: #003d80;
+    color: #fff !important;
+} 

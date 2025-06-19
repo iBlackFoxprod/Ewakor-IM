@@ -1,0 +1,312 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: EWAKOR Inventory\n"
+"POT-Creation-Date: 2024-03-17 17:00+0000\n"
+"PO-Revision-Date: 2024-03-17 17:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Products"
+msgstr "Products"
+
+msgid "Incoming Stock"
+msgstr "Incoming Stock"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "System Admin"
+msgstr "System Administration"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Add Product"
+msgstr "Add Product"
+
+msgid "Edit Product"
+msgstr "Edit Product"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Save Changes"
+msgstr "Save Changes"
+
+msgid "Product Name"
+msgstr "Product Name"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Quantity"
+msgstr "Quantity"
+
+msgid "Unit Price"
+msgstr "Unit Price"
+
+msgid "Product Image"
+msgstr "Product Image"
+
+msgid "Maximum file size: 16MB. Supported formats: JPG, PNG, GIF"
+msgstr "Maximum file size: 16MB. Supported formats: JPG, PNG, GIF"
+
+msgid "Image"
+msgstr "Image"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Confirm Delete"
+msgstr "Confirm Delete"
+
+msgid "Are you sure you want to delete this product?"
+msgstr "Are you sure you want to delete this product?"
+
+msgid "Add New User"
+msgstr "Add New User"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Role"
+msgstr "Role"
+
+msgid "User"
+msgstr "User"
+
+msgid "Administrator"
+msgstr "Administrator"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Inactive"
+msgstr "Inactive"
+
+msgid "Edit User"
+msgstr "Edit User"
+
+msgid "Access denied. Admin privileges required."
+msgstr "Access denied. Admin privileges required."
+
+msgid "Settings updated successfully."
+msgstr "Settings updated successfully."
+
+msgid "Product added successfully."
+msgstr "Product added successfully."
+
+msgid "Product updated successfully."
+msgstr "Product updated successfully."
+
+msgid "User added successfully."
+msgstr "User added successfully."
+
+msgid "User updated successfully."
+msgstr "User updated successfully."
+
+msgid "User deleted successfully."
+msgstr "User deleted successfully."
+
+msgid "Email already registered."
+msgstr "Email already registered."
+
+msgid "Cannot remove the last administrator."
+msgstr "Cannot remove the last administrator."
+
+msgid "Cannot delete the last administrator."
+msgstr "Cannot delete the last administrator."
+
+msgid "Cannot delete your own account."
+msgstr "Cannot delete your own account."
+
+msgid "Total Products"
+msgstr "Total Products"
+
+msgid "Low Stock Items"
+msgstr "Low Stock Items"
+
+msgid "Pending Deliveries"
+msgstr "Pending Deliveries"
+
+msgid "Low Stock Alerts"
+msgstr "Low Stock Alerts"
+
+msgid "Upcoming Deliveries"
+msgstr "Upcoming Deliveries"
+
+msgid "Stock Levels Overview"
+msgstr "Stock Levels Overview"
+
+msgid "Add Incoming Stock"
+msgstr "Add Incoming Stock"
+
+msgid "Supplier"
+msgstr "Supplier"
+
+msgid "Expected Date"
+msgstr "Expected Date"
+
+msgid "Expected Quantity"
+msgstr "Expected Quantity"
+
+msgid "PO Number"
+msgstr "PO Number"
+
+msgid "Notes"
+msgstr "Notes"
+
+msgid "Company Settings"
+msgstr "Company Settings"
+
+msgid "Language"
+msgstr "Language"
+
+msgid "Company Logo"
+msgstr "Company Logo"
+
+msgid "Upload New Logo"
+msgstr "Upload New Logo"
+
+msgid "Current Logo"
+msgstr "Current Logo"
+
+msgid "Current Stock"
+msgstr "Current Stock"
+
+msgid "Min Level"
+msgstr "Minimum Level"
+
+msgid "No low stock alerts"
+msgstr "No low stock alerts"
+
+msgid "No pending deliveries"
+msgstr "No pending deliveries"
+
+msgid "Minimum Stock Level"
+msgstr "Minimum Stock Level"
+
+msgid "An error occurred"
+msgstr "An error occurred"
+
+msgid "Mark this delivery as received?"
+msgstr "Mark this delivery as received?"
+
+msgid "Cancel this delivery?"
+msgstr "Cancel this delivery?"
+
+msgid "Category"
+msgstr "Category"
+
+msgid "Select Category"
+msgstr "Select Category"
+
+msgid "Lubricants"
+msgstr "Lubricants"
+
+msgid "Chemicals"
+msgstr "Chemicals"
+
+msgid "Tools"
+msgstr "Tools"
+
+msgid "Spare Parts"
+msgstr "Spare Parts"
+
+msgid "Safety Equipment"
+msgstr "Safety Equipment"
+
+msgid "Other"
+msgstr "Other"
+
+msgid "Product Type"
+msgstr "Product Type"
+
+msgid "Select Type"
+msgstr "Select Type"
+
+msgid "Spray"
+msgstr "Spray"
+
+msgid "Container"
+msgstr "Container"
+
+msgid "Jug"
+msgstr "Jug"
+
+msgid "Box"
+msgstr "Box"
+
+msgid "Bottle"
+msgstr "Bottle"
+
+msgid "Container Type"
+msgstr "Container Type"
+
+msgid "Select Container Type"
+msgstr "Select Container Type"
+
+msgid "Metal Container"
+msgstr "Metal Container"
+
+msgid "Plastic Jug"
+msgstr "Plastic Jug"
+
+msgid "Cardboard Box"
+msgstr "Cardboard Box"
+
+msgid "Steel Drum"
+msgstr "Steel Drum"
+
+msgid "Unit"
+msgstr "Unit"
+
+msgid "Pieces"
+msgstr "Pieces"
+
+msgid "Boxes"
+msgstr "Boxes"
+
+msgid "Kilograms"
+msgstr "Kilograms"
+
+msgid "Liters"
+msgstr "Liters"
+
+msgid "Meters"
+msgstr "Meters"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Low Stock"
+msgstr "Low Stock"
+
+msgid "In Stock"
+msgstr "In Stock"
+
+msgid "No image"
+msgstr "No image"
+
+msgid "Save Changes"
+msgstr "Save Changes" 

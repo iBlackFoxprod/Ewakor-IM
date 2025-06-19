@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="{{ settings.language if settings else 'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EWAKOR Inventory - {% block title %}{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='custom.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --ewakor-blue: #0054A6;
+            --ewakor-gray: #7F8C8D;
+        }
+        
+        body {
+            background-color: #ffffff;
+            color: #333333;
+        }
+        
+        .navbar {
+            background-color: var(--ewakor-blue) !important;
+        }
+        
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .table {
+            color: #333333;
+        }
+        
+        .table thead th {
+            background-color: var(--ewakor-blue);
+            color: #ffffff;
+            border-color: #e0e0e0;
+        }
+        
+        .table td {
+            border-color: #e0e0e0;
+        }
+        
+        .btn-primary {
+            background-color: var(--ewakor-blue);
+            border-color: var(--ewakor-blue);
+        }
+        
+        .btn-primary:hover {
+            background-color: #004080;
+            border-color: #004080;
+        }
+        
+        .alert {
+            background-color: #ffffff;
+            border-color: #e0e0e0;
+            color: #333333;
+        }
+        
+        .form-control {
+            background-color: #ffffff;
+            border-color: #e0e0e0;
+            color: #333333;
+        }
+        
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: var(--ewakor-blue);
+            color: #333333;
+            box-shadow: 0 0 0 0.2rem rgba(0, 84, 166, 0.25);
+        }
+
+        .form-select {
+            background-color: #ffffff;
+            border-color: #e0e0e0;
+            color: #333333;
+        }
+
+        .form-select:focus {
+            border-color: var(--ewakor-blue);
+            box-shadow: 0 0 0 0.2rem rgba(0, 84, 166, 0.25);
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            color: #333333;
+        }
+
+        .dropdown-menu {
+            background-color: #ffffff;
+            border-color: #e0e0e0;
+        }
+
+        .dropdown-item {
+            color: #333333;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: var(--ewakor-blue);
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .badge {
+            color: #ffffff;
+        }
+
+        .bg-success {
+            background-color: #28a745 !important;
+        }
+
+        .bg-warning {
+            background-color: #ffc107 !important;
+            color: #333333 !important;
+        }
+
+        .bg-secondary {
+            background-color: #6c757d !important;
+        }
+
+        .company-logo {
+            max-height: 40px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    {% if request.endpoint != 'login' %}
+        <!-- Responsive Navbar for mobile -->
+        <nav class="navbar navbar-expand-lg navbar-dark d-lg-none" style="background-color: var(--ewakor-blue);">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">EWAKOR</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-controls="mobileNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mobileNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">{{ _('Dashboard') }}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('products') }}">{{ _('Products') }}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('incoming_stock') }}">{{ _('Incoming Stock') }}</a></li>
+                        {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('settings') }}">{{ _('Settings') }}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('system_admin') }}">{{ _('System Admin') }}</a></li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">{{ _('Logout') }}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Sidebar for desktop -->
+        <div class="sidebar d-none d-lg-flex flex-column">
+            <div class="logo">EWAKOR</div>
+            <nav>
+                <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}"><i class="fas fa-home me-2"></i> {{ _('Dashboard') }}</a>
+                <a href="{{ url_for('products') }}" class="{% if request.endpoint == 'products' %}active{% endif %}"><i class="fas fa-box me-2"></i> {{ _('Products') }}</a>
+                <a href="{{ url_for('incoming_stock') }}" class="{% if request.endpoint == 'incoming_stock' %}active{% endif %}"><i class="fas fa-truck me-2"></i> {{ _('Incoming Stock') }}</a>
+                {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                <a href="{{ url_for('settings') }}" class="{% if request.endpoint == 'settings' %}active{% endif %}"><i class="fas fa-cog me-2"></i> {{ _('Settings') }}</a>
+                <a href="{{ url_for('system_admin') }}" class="{% if request.endpoint == 'system_admin' %}active{% endif %}"><i class="fas fa-users-cog me-2"></i> {{ _('System Admin') }}</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> {{ _('Logout') }}</a>
+            </nav>
+            <div class="user mt-auto">
+                <i class="fas fa-user-circle me-1"></i> {{ current_user.name if current_user.is_authenticated else '' }}
+            </div>
+        </div>
+    {% endif %}
+    <div class="main-content">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html> 

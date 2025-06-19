@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Company Settings') }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title mb-4">{{ _('Company Settings') }}</h3>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <h5>{{ _('Language') }}</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="language" id="lang_en" value="en" {% if settings.language == 'en' %}checked{% endif %}>
+                            <label class="form-check-label" for="lang_en">
+                                English
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="language" id="lang_fr" value="fr" {% if settings.language == 'fr' %}checked{% endif %}>
+                            <label class="form-check-label" for="lang_fr">
+                                Français
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>{{ _('Company Logo') }}</h5>
+                        {% if settings.logo_path %}
+                        <div class="mb-3">
+                            <p class="text-muted">{{ _('Current Logo') }}</p>
+                            <img src="{{ url_for('static', filename=settings.logo_path) }}" alt="Company Logo" class="img-thumbnail" style="max-height: 100px;">
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="logo" class="form-label">{{ _('Upload New Logo') }}</label>
+                            <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+                            <div class="form-text">Recommended size: 200x200 pixels, PNG or JPG format</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
+                        <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

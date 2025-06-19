@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Products') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="card-title mb-0">{{ _('Products') }}</h2>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#uploadCSVModal">
+                <i class="fas fa-file-upload me-1"></i> {{ _('Upload CSV') }}
+            </button>
+            <a href="{{ url_for('add_product') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> {{ _('Add Product') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" id="productSearch" class="form-control" placeholder="Rechercher un produit par nom...">
+        </div>
+    </div>
+
+    <!-- Desktop Table View -->
+    <div class="d-none d-md-block">
+        <div class="table-responsive">
+            <table class="table table-products align-middle table-hover">
+                <thead class="align-middle">
+                    <tr>
+                        <th>{{ _('Image') }}</th>
+                        <th>{{ _('Name') }}</th>
+                        <th>{{ _('Category') }}</th>
+                        <th>{{ _('Type') }}</th>
+                        <th>{{ _('Quantity') }}</th>
+                        <th>{{ _('Unit') }}</th>
+                        <th>{{ _('Actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            {% if product.image_path %}
+                            <img src="{{ url_for('static', filename=product.image_path) }}" alt="{{ product.name }}" class="img-thumbnail" style="max-width: 50px;">
+                            {% endif %}
+                        </td>
+                        <td><a href="{{ url_for('edit_product', product_id=product.id) }}">{{ product.name }}</a></td>
+                        <td>{% if product.category %}{{ _(product.category.capitalize()) }}{% else %}-{% endif %}</td>
+                        <td>{{ _(product.product_type.capitalize()) }}</td>
+                        <td>{{ product.quantity }}</td>
+                        <td>{{ product.unit }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="deleteProduct({{ product.id }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="d-md-none">
+        <div class="row g-3">
+            {% for product in products %}
+            <div class="col-12">
+                <div class="card h-100">
+                    <div class="row g-0">
+                        <div class="col-4">
+                            {% if product.image_path %}
+                            <img src="{{ url_for('static', filename=product.image_path) }}" class="img-fluid rounded-start h-100 object-fit-cover" alt="{{ product.name }}">
+                            {% endif %}
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text mb-1">
+                                    <small class="text-muted">{% if product.category %}{{ _(product.category.capitalize()) }}{% else %}-{% endif %} | {{ _(product.product_type.capitalize()) }}</small>
+                                </p>
+                                <p class="card-text mb-1">
+                                    <strong>{{ _('Quantity') }}:</strong> {{ product.quantity }} {{ product.unit }}
+                                </p>
+                                <div class="btn-group w-100">
+                                    <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-warning">
+                                        <i class="fas fa-edit me-1"></i> {{ _('Edit') }}
+                                    </a>
+                                    <button type="button" class="btn btn-danger" onclick="deleteProduct({{ product.id }})">
+                                        <i class="fas fa-trash me-1"></i> {{ _('Delete') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Upload CSV Modal -->
+<div class="modal fade" id="uploadCSVModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('Upload Products CSV') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('upload_products_csv') }}" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="csvFile" class="form-label">{{ _('Select CSV File') }}</label>
+                        <input type="file" class="form-control" id="csvFile" name="file" accept=".csv" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">{{ _('Upload') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Mobile enhancements */
+@media (max-width: 576px) {
+    .container-fluid {
+        padding: 0.5rem;
+    }
+    .card {
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .card-body {
+        padding: 0.75rem;
+    }
+    .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    .card-text {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    .btn-group {
+        gap: 0.25rem;
+    }
+    .btn {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    .modal-content {
+        border-radius: 0.5rem;
+    }
+    .modal-body {
+        padding: 1rem;
+    }
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .d-flex.justify-content-between .btn {
+        width: 100%;
+    }
+    .img-fluid {
+        height: 100%;
+        object-fit: cover;
+    }
+}
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const products = {{ products_json|tojson }};
+
+function deleteProduct(productId) {
+    if (confirm('{{ _("Are you sure you want to delete this product?") }}')) {
+        window.location.href = `/products/delete/${productId}`;
+    }
+}
+
+document.getElementById('productSearch').addEventListener('input', function() {
+    const search = this.value.toLowerCase();
+    document.querySelectorAll('table.table-products tbody tr').forEach(row => {
+        const name = row.querySelector('td:nth-child(2) a').textContent.toLowerCase();
+        row.style.display = name.includes(search) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %} 

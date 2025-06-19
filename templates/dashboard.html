@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Dashboard') }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-box me-2"></i>{{ _('Total Products') }}
+                </h5>
+                <h2 class="card-text">{{ products|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>{{ _('Low Stock Items') }}
+                </h5>
+                <h2 class="card-text">{{ low_stock|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-truck me-2"></i>{{ _('Pending Deliveries') }}
+                </h5>
+                <h2 class="card-text">{{ incoming|length }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Low Stock Alerts') }}</h5>
+                {% if low_stock %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{{ _('Product') }}</th>
+                                <th>{{ _('Current Stock') }}</th>
+                                <th>{{ _('Min Level') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in low_stock %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.quantity }} {{ product.unit }}</td>
+                                <td>{{ product.min_stock_level }} {{ product.unit }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">{{ _('No low stock alerts') }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Upcoming Deliveries') }}</h5>
+                {% if incoming %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{{ _('Product') }}</th>
+                                <th>{{ _('Supplier') }}</th>
+                                <th>{{ _('Expected Date') }}</th>
+                                <th>{{ _('Quantity') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in incoming %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.supplier }}</td>
+                                <td>{{ item.expected_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ item.expected_quantity }} {{ item.product.unit }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">{{ _('No pending deliveries') }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Stock Levels Overview') }}</h5>
+                <canvas id="stockChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('stockChart').getContext('2d');
+    const products = {{ products_json|tojson|safe }};
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: products.map(p => p.name),
+            datasets: [{
+                label: '{{ _("Current Stock") }}',
+                data: products.map(p => p.quantity),
+                backgroundColor: '#0054A6',
+                borderColor: '#0054A6',
+                borderWidth: 1
+            }, {
+                label: '{{ _("Minimum Stock Level") }}',
+                data: products.map(p => p.min_stock_level),
+                backgroundColor: '#7F8C8D',
+                borderColor: '#7F8C8D',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#e0e0e0'
+                    },
+                    ticks: {
+                        color: '#333333'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: '#e0e0e0'
+                    },
+                    ticks: {
+                        color: '#333333'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#333333'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

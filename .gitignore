@@ -1,0 +1,4 @@
+# ... existing code ...
+backups/
+.env
+instance/ewakor.db 
