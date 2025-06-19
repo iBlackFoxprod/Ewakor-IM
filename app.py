@@ -105,7 +105,6 @@ def product_to_dict(product):
         'container_type': product.container_type,
         'quantity': product.quantity,
         'unit': product.unit,
-        'unit_price': product.unit_price,
         'image_path': product.image_path
     }
 
@@ -169,12 +168,10 @@ def products():
 def add_product():
     if request.method == 'POST':
         name = request.form.get('name')
-        description = request.form.get('description')
         category = request.form.get('category')
         product_type = request.form.get('product_type')
         container_type = request.form.get('container_type')
         quantity = int(request.form.get('quantity', 0))
-        unit_price = float(request.form.get('unit_price', 0))
         min_stock_level = int(request.form.get('min_stock_level', 10))
         unit = request.form.get('unit', 'pcs')
         
@@ -186,12 +183,10 @@ def add_product():
         
         product = Product(
             name=name,
-            description=description,
             category=category,
             product_type=product_type,
             container_type=container_type,
             quantity=quantity,
-            unit_price=unit_price,
             min_stock_level=min_stock_level,
             unit=unit,
             image_path=image_path
@@ -214,12 +209,10 @@ def edit_product(product_id):
     
     if request.method == 'POST':
         product.name = request.form.get('name')
-        product.description = request.form.get('description')
         product.category = request.form.get('category')
         product.product_type = request.form.get('product_type')
         product.container_type = request.form.get('container_type')
         product.quantity = int(request.form.get('quantity', 0))
-        product.unit_price = float(request.form.get('unit_price', 0))
         product.min_stock_level = int(request.form.get('min_stock_level', 10))
         product.unit = request.form.get('unit', 'pcs')
         
@@ -264,11 +257,11 @@ def delete_product(product_id):
 @app.route('/products/upload-csv', methods=['POST'])
 @login_required
 def upload_products_csv():
-    if 'csv_file' not in request.files:
+    if 'csv_file' not in request.files and 'file' not in request.files:
         flash('No file part', 'danger')
         return redirect(url_for('products'))
-    file = request.files['csv_file']
-    if file.filename == '':
+    file = request.files.get('csv_file') or request.files.get('file')
+    if not file or file.filename == '':
         flash('No selected file', 'danger')
         return redirect(url_for('products'))
     try:
@@ -276,34 +269,17 @@ def upload_products_csv():
         reader = csv.DictReader(stream)
         count = 0
         for row in reader:
-            image_path = None
-            image_link = row.get('image_link', '').strip()
-            if image_link:
-                try:
-                    img_data = requests.get(image_link, timeout=10).content
-                    ext = image_link.split('.')[-1].split('?')[0].lower()
-                    if ext not in ['jpg', 'jpeg', 'png', 'gif']:
-                        ext = 'jpg'
-                    filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}_csv.{ext}"
-                    save_dir = os.path.join(str(app.static_folder) if app.static_folder else 'static', 'uploads', 'products')
-                    os.makedirs(save_dir, exist_ok=True)
-                    file_path = os.path.join(save_dir, filename)
-                    with open(file_path, 'wb') as f:
-                        f.write(img_data)
-                    image_path = f"uploads/products/{filename}"
-                except Exception as e:
-                    print(f"Failed to download image for {row.get('name')}: {e}")
+            name = row.get('Product Name') or row.get('name')
+            quantity = int(row.get('Quantity', 0) or row.get('quantity', 0))
+            if not name:
+                continue
             product = Product(
-                name=row.get('name', ''),
-                description=row.get('description', ''),
-                category=row.get('category', ''),
-                product_type=row.get('product_type', ''),
-                container_type=row.get('container_type', ''),
-                quantity=int(row.get('quantity', 0)),
-                unit_price=float(row.get('unit_price', 0)),
-                min_stock_level=int(row.get('min_stock_level', 1)),
-                unit=row.get('unit', 'pcs'),
-                image_path=image_path
+                name=name,
+                quantity=quantity,
+                product_type='other',
+                container_type='',
+                min_stock_level=1,
+                unit='pcs'
             )
             db.session.add(product)
             count += 1

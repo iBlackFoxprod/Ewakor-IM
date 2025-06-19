@@ -52,13 +52,11 @@ class Product(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
     category = db.Column(db.String(50), nullable=False)  # e.g., "Lubrifiants", "Produits chimiques", "Outils"
     product_type = db.Column(db.String(50), nullable=False)  # e.g., "Spray", "Jerrican", "Carton"
     container_type = db.Column(db.String(50))  # Jerrican 20L, Jerrican 5L, Seau métallique 20L, Carton (4x5L), Spray
     packaging = db.Column(db.String(20), default='Unité')  # 'Unité' or 'En carton'
     quantity = db.Column(db.Integer, default=0)
-    unit_price = db.Column(db.Float, default=0.0)
     image_path = db.Column(db.String(200))
     min_stock_level = db.Column(db.Integer, default=10)
     unit = db.Column(db.String(20), default='pcs')
