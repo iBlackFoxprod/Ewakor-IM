@@ -36,6 +36,31 @@
     </div>
 </div>
 
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body d-flex flex-wrap gap-2 align-items-center">
+                <a href="{{ url_for('export_products') }}" class="btn btn-success">
+                    <i class="fas fa-file-export me-1"></i> Exporter les produits (CSV)
+                </a>
+                <a href="{{ url_for('export_deliveries') }}" class="btn btn-success">
+                    <i class="fas fa-file-export me-1"></i> Exporter les livraisons (CSV)
+                </a>
+                <a href="{{ url_for('download_backup') }}" class="btn btn-primary">
+                    <i class="fas fa-database me-1"></i> Télécharger la sauvegarde
+                </a>
+                <form action="{{ url_for('restore_backup') }}" method="post" enctype="multipart/form-data" class="d-inline-block">
+                    <label class="btn btn-warning mb-0">
+                        <i class="fas fa-upload me-1"></i> Restaurer une sauvegarde
+                        <input type="file" name="backup_file" accept=".db" style="display:none" onchange="this.form.submit()">
+                    </label>
+                </form>
+                <span class="text-muted ms-3">Sauvegardes automatiques quotidiennes dans le dossier backups/</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-6 mb-4">
         <div class="card">

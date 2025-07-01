@@ -17,6 +17,12 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 import shutil
 from functools import wraps
+import threading
+import time
+from sqlalchemy import or_
+import openpyxl
+from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
 
 # Get the absolute path to the instance directory
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -158,10 +164,20 @@ def settings():
 @app.route('/products')
 @login_required
 def products():
-    products = Product.query.all()
+    search = request.args.get('search', '').strip()
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    query = Product.query
+    if search:
+        query = query.filter(Product.name.ilike(f'%{search}%'))
+        products = query.all()
+        pagination = None
+    else:
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+        products = pagination.items
     settings = Settings.query.first()
     products_list = [product_to_dict(p) for p in products]
-    return render_template('products.html', products=products, products_json=products_list, settings=settings)
+    return render_template('products.html', products=products, products_json=products_list, settings=settings, pagination=pagination, search=search)
 
 @app.route('/products/add', methods=['GET', 'POST'])
 @login_required
@@ -537,36 +553,190 @@ def save_image(file, folder):
         return os.path.join(app.config['UPLOAD_FOLDER'].replace('static/', ''), folder, filename).replace('\\', '/')
     return None
 
-@app.route('/export_products')
-@admin_required
+@app.route('/export/products')
+@login_required
 def export_products():
-    si = StringIO()
-    cw = csv.writer(si)
-    # Write header
-    cw.writerow(['id', 'name', 'category', 'product_type', 'container_type', 'quantity', 'unit', 'unit_price', 'image_path'])
-    # Write product rows
-    for p in Product.query.all():
-        cw.writerow([
-            p.id,
-            p.name,
-            p.category,
-            p.product_type,
-            p.container_type,
-            p.quantity,
-            p.unit,
-            p.unit_price,
-            p.image_path
-        ])
-    output = si.getvalue().encode('utf-8')
-    si.close()
-    return send_file(
-        BytesIO(output),
-        mimetype='text/csv',
-        as_attachment=True,
-        download_name='products_export.csv'
-    )
+    export_format = request.args.get('format', 'csv')
+    products = Product.query.all()
+    headers = ['id', 'name', 'category', 'product_type', 'container_type', 'quantity', 'unit', 'image_path']
+    if export_format == 'xlsx':
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = 'Produits'
+        ws.append(headers)
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+        for p in products:
+            ws.append([
+                p.id,
+                p.name,
+                p.category,
+                p.product_type,
+                p.container_type,
+                p.quantity,
+                p.unit,
+                p.image_path
+            ])
+        for col in ws.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                try:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+            ws.column_dimensions[col_letter].width = max_length + 2
+        output = BytesIO()
+        wb.save(output)
+        output.seek(0)
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=f'products_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+        )
+    else:
+        si = StringIO()
+        cw = csv.writer(si)
+        cw.writerow(headers)
+        for p in products:
+            cw.writerow([
+                p.id,
+                p.name,
+                p.category,
+                p.product_type,
+                p.container_type,
+                p.quantity,
+                p.unit,
+                p.image_path
+            ])
+        output = si.getvalue().encode('utf-8')
+        si.close()
+        return send_file(
+            BytesIO(output),
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name=f'products_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+        )
 
+@app.route('/export/deliveries')
+@login_required
+def export_deliveries():
+    export_format = request.args.get('format', 'csv')
+    deliveries = IncomingStock.query.all()
+    headers = ['id', 'product', 'supplier', 'expected_quantity', 'expected_date', 'status', 'po_number', 'notes']
+    if export_format == 'xlsx':
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = 'Livraisons'
+        ws.append(headers)
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+        for d in deliveries:
+            ws.append([
+                d.id,
+                d.product.name if d.product else '',
+                d.supplier,
+                d.expected_quantity,
+                d.expected_date,
+                d.status,
+                d.po_number,
+                d.notes
+            ])
+        for col in ws.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                try:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+            ws.column_dimensions[col_letter].width = max_length + 2
+        output = BytesIO()
+        wb.save(output)
+        output.seek(0)
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=f'deliveries_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+        )
+    else:
+        si = StringIO()
+        cw = csv.writer(si)
+        cw.writerow(headers)
+        for d in deliveries:
+            cw.writerow([
+                d.id,
+                d.product.name if d.product else '',
+                d.supplier,
+                d.expected_quantity,
+                d.expected_date,
+                d.status,
+                d.po_number,
+                d.notes
+            ])
+        output = si.getvalue().encode('utf-8')
+        si.close()
+        return send_file(
+            BytesIO(output),
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name=f'deliveries_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+        )
+
+@app.route('/backup/download')
+@login_required
+@admin_required
+def download_backup():
+    db_path = get_db_path()
+    backup_name = f'ewakor_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.db'
+    backup_path = os.path.join(BACKUP_FOLDER, backup_name)
+    shutil.copy2(db_path, backup_path)
+    return send_file(backup_path, as_attachment=True)
+
+@app.route('/backup/restore', methods=['POST'])
+@login_required
+@admin_required
+def restore_backup():
+    if 'backup_file' not in request.files:
+        flash('No file part', 'danger')
+        return redirect(url_for('dashboard'))
+    file = request.files['backup_file']
+    if file.filename == '':
+        flash('No selected file', 'danger')
+        return redirect(url_for('dashboard'))
+    filename = secure_filename(file.filename)
+    restore_path = os.path.join(BACKUP_FOLDER, f'restore_{datetime.now().strftime("%Y%m%d_%H%M%S")}_{filename}')
+    file.save(restore_path)
+    db_path = get_db_path()
+    shutil.copy2(restore_path, db_path)
+    flash('Backup restored successfully.', 'success')
+    return redirect(url_for('dashboard'))
+
+# Automatic daily backup logic
+
+def daily_backup_thread():
+    while True:
+        now = datetime.now()
+        next_run = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        if now >= next_run:
+            next_run = next_run.replace(day=now.day + 1)
+        wait_seconds = (next_run - now).total_seconds()
+        time.sleep(wait_seconds)
+        try:
+            db_path = get_db_path()
+            backup_name = f'ewakor_autobackup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.db'
+            backup_path = os.path.join(BACKUP_FOLDER, backup_name)
+            shutil.copy2(db_path, backup_path)
+        except Exception as e:
+            print(f"Automatic backup failed: {e}")
+
+# Start the backup thread only if running as main
 if __name__ == '__main__':
+    threading.Thread(target=daily_backup_thread, daemon=True).start()
     import sys
     host = '0.0.0.0'
     port = 5000

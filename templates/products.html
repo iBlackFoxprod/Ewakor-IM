@@ -18,7 +18,13 @@
 
     <div class="row mb-3">
         <div class="col-md-6">
-            <input type="text" id="productSearch" class="form-control" placeholder="Rechercher un produit par nom...">
+            <form method="get" action="{{ url_for('products') }}" class="d-flex gap-2">
+                <input type="text" id="productSearch" name="search" class="form-control" placeholder="Rechercher un produit par nom..." value="{{ search|default('') }}">
+                {% if search %}
+                <a href="{{ url_for('products') }}" class="btn btn-outline-secondary">Réinitialiser</a>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </form>
         </div>
     </div>
 
@@ -104,6 +110,39 @@
             {% endfor %}
         </div>
     </div>
+
+    <!-- Pagination controls -->
+    {% if pagination %}
+    <nav aria-label="Product pagination" class="mt-3">
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('products', page=pagination.prev_num) }}">&laquo; Précédent</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">&laquo; Précédent</span></li>
+            {% endif %}
+            {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    {% if page_num == pagination.page %}
+                        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('products', page=page_num) }}">{{ page_num }}</a></li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('products', page=pagination.next_num) }}">Suivant &raquo;</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Suivant &raquo;</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 
 <!-- Upload CSV Modal -->
